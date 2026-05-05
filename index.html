@@ -550,7 +550,7 @@ function sync() {
   D.dist.length=D.months; D.pay.length=D.months;
 }
 function saveLocal() { localStorage.setItem('jv3',JSON.stringify(D)); }
-function save() { saveLocal(); pushToFirebase(); render(); }
+function save() { saveLocal(); render(); pushToFirebase(); }
 
 // ══════════════════════════════════════════════
 // SECRET SEQUENCE: 🪙x4 then titleX2 within 3s
@@ -883,7 +883,8 @@ function addM() {
   D.members.push({n,a});
   document.getElementById('mName').value=''; document.getElementById('mAmt').value='';
   D.pay.forEach(r=>{if(!r[n])r[n]={amount:a,paid:false,date:''};});
-  save(); toast('✔ تمت إضافة العضو');
+  save();
+  toast('✔ تمت إضافة العضو');
 }
 function delM(i) {
   confirm2('حذف العضو؟','سيتم حذف العضو من جميع الأشهر.',()=>{
@@ -1198,12 +1199,11 @@ function confirm2(title,msg,cb){
 // ══════════════════════════════════════════════
 load();
 populateMemberSel();
+// إخفاء شاشة التحميل بعد تحميل البيانات المحلية فوراً
+const _ls = document.getElementById('loadingScreen');
+if (_ls) _ls.style.display = 'none';
+// ثم الاتصال بـ Firebase في الخلفية
 initFirebase();
-// Fallback: إخفاء شاشة التحميل بعد 5 ثوانٍ إذا لم يستجب Firebase
-setTimeout(() => {
-  const ls = document.getElementById('loadingScreen');
-  if (ls) ls.style.display = 'none';
-}, 5000);
 </script>
 
 </body>
