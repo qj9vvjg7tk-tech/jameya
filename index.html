@@ -8,99 +8,37 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="الجمعية"/>
-<meta name="mobile-web-app-capable" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <title>نظام الجمعية</title>
-
-<!-- Firebase SDK — loaded async to not block UI -->
-
-<script>
-function loadFirebaseAsync() {
-  const s1 = document.createElement('script');
-  s1.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
-  s1.onload = function() {
-    const s2 = document.createElement('script');
-    s2.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
-    s2.onload = function() { 
-      if (typeof initFirebase === 'function') initFirebase();
-    };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
-}
-</script>
-
 <style>
-:root {
-  --bg:#080e14; --surface:#0f1923; --card:#152030; --card2:#1a2a3a;
-  --green:#00e676; --green-dim:#1b4332;
-  --gold:#f9a825; --gold-dim:#3a2800;
-  --red:#ff5252; --red-dim:#3a0a0a;
-  --blue:#40c4ff; --blue-dim:#0a2a3a;
-  --text:#e8f0fe; --muted:#6b8fa8; --border:#1e3448;
-  --radius:14px; --safe-bottom:env(safe-area-inset-bottom,0px);
-}
+:root{--bg:#080e14;--surface:#0f1923;--card:#152030;--card2:#1a2a3a;--green:#00e676;--green-dim:#1b4332;--gold:#f9a825;--gold-dim:#3a2800;--red:#ff5252;--red-dim:#3a0a0a;--blue:#40c4ff;--blue-dim:#0a2a3a;--text:#e8f0fe;--muted:#6b8fa8;--border:#1e3448;--radius:14px;--sb:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{font-family:-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:520px;margin:0 auto;overscroll-behavior:none}
-
-/* INSTALL BANNER */
-#installBanner{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:var(--green);color:#000;padding:10px 16px;z-index:300;align-items:center;justify-content:space-between;font-size:.8rem;font-weight:700}
-#installBanner.show{display:flex}
-.install-btn{background:#000;color:var(--green);border:none;border-radius:8px;padding:5px 12px;font-weight:700;cursor:pointer;font-size:.78rem}
-
-/* OFFLINE */
-#offlineBadge{display:none;position:fixed;bottom:calc(70px + var(--safe-bottom));left:50%;transform:translateX(-50%);background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:20px;padding:5px 14px;font-size:.72rem;font-weight:700;z-index:200}
-
-/* AUTOLOCK OVERLAY */
-#lockOverlay{display:none;position:fixed;inset:0;background:rgba(8,14,20,.97);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-#lockOverlay.show{display:flex}
-#lockOverlay .lock-icon{font-size:3rem}
-#lockOverlay p{color:var(--muted);font-size:.85rem}
-
-/* SYNC INDICATOR */
-#syncDot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:4px;vertical-align:middle;transition:background .3s}
-#syncDot.synced{background:var(--green)}
-#syncDot.syncing{background:var(--gold);animation:pulse .8s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* LOGIN */
 #loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 20px;background:radial-gradient(ellipse at top,#0f2030 0%,#080e14 70%)}
 .login-logo{font-size:3.5rem;margin-bottom:8px;user-select:none;cursor:default}
 .login-title{font-size:1.8rem;font-weight:900;color:var(--green);margin-bottom:4px;user-select:none;cursor:default}
 .login-sub{font-size:.78rem;color:var(--muted);margin-bottom:28px}
 .login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 18px;width:100%;max-width:360px}
 .lf-label{font-size:.76rem;color:var(--muted);display:block;margin-bottom:4px;margin-top:10px}
-
-/* TOPBAR */
-.topbar{background:linear-gradient(135deg,#0f1923 0%,#152030 100%);padding:14px 16px 10px;padding-top:calc(14px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar{background:linear-gradient(135deg,#0f1923,#152030);padding:14px 16px 10px;padding-top:calc(14px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .topbar-title{font-size:1.1rem;font-weight:900;color:var(--green)}
 .topbar-sub{font-size:.67rem;color:var(--muted);margin-top:1px}
 .role-badge{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px}
 .role-admin{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold)}
 .role-member{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue)}
-
-/* TABS */
 .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:1;min-width:60px;text-align:center;padding:10px 3px;cursor:pointer;font-size:.7rem;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 .tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:700}
-
-/* PAGES */
-.page{display:none;padding:14px 12px;padding-bottom:calc(90px + var(--safe-bottom));animation:fadeIn .22s}
+.page{display:none;padding:14px 12px;padding-bottom:calc(90px + var(--sb));animation:fadeIn .22s}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-
-/* CARD */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
 .card-title{font-size:.82rem;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-
-/* INPUTS */
-input,select,textarea{width:100%;padding:9px 12px;margin:5px 0;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:.84rem;outline:none;transition:border .2s;-webkit-appearance:none;appearance:none}
+input,select,textarea{width:100%;padding:9px 12px;margin:5px 0;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:.84rem;outline:none;transition:border .2s;-webkit-appearance:none}
 input:focus,select:focus{border-color:var(--green)}
 input::placeholder{color:var(--muted)}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%236b8fa8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center;padding-left:30px}
-
-/* BUTTONS */
 .btn{padding:7px 14px;border:none;border-radius:8px;font-family:inherit;font-size:.81rem;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
 .btn:active{transform:scale(.96)}
 .btn-green{background:var(--green);color:#000}
@@ -113,40 +51,26 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .btn-muted{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
 .btn-sm{padding:5px 10px;font-size:.73rem}
 .btn-block{display:flex;width:100%;text-align:center;margin-top:7px;justify-content:center}
-
-/* CHIPS */
 .chip{display:inline-flex;align-items:center;gap:4px;background:var(--green-dim);color:var(--green);padding:3px 10px;border-radius:20px;font-size:.73rem;margin:2px}
 .chip-gold{background:var(--gold-dim);color:var(--gold)}
 .chip-blue{background:var(--blue-dim);color:var(--blue)}
 .chip-red{background:var(--red-dim);color:var(--red)}
-
-/* TABLE */
 table{width:100%;border-collapse:collapse;font-size:.77rem}
 th{background:var(--surface);color:var(--muted);padding:8px 6px;font-weight:600}
 td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
-
-/* STATS */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center}
 .stat-val{font-size:1.35rem;font-weight:900}
 .stat-label{font-size:.71rem;color:var(--muted);margin-top:3px}
-
-/* MONTH CARD */
 .month-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
 .month-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);cursor:pointer;user-select:none}
 .month-title{font-weight:700;font-size:.87rem}
 .month-body{padding:12px;display:none}
 .month-body.open{display:block}
-
-/* PROGRESS */
 .progress-bar{background:var(--surface);border-radius:6px;height:6px;margin:6px 0;overflow:hidden}
 .progress-fill{height:100%;border-radius:6px;background:var(--green);transition:width .4s}
-
-/* MEMBER ROW */
 .member-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border)}
 .member-row:first-child{border-top:none}
-
-/* MEMBER VIEW */
 .mv-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;text-align:center}
 .mv-name{font-size:1.35rem;font-weight:900;color:var(--green);margin-bottom:6px}
 .mv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0}
@@ -155,26 +79,23 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
 .mv-lbl{font-size:.64rem;color:var(--muted);margin-top:2px}
 .mv-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:10px;margin-bottom:6px;background:var(--surface);font-size:.79rem}
 .mv-item.col{flex-direction:column;align-items:flex-start;gap:6px}
-
-/* SHARE URL */
-.share-url{font-size:.69rem;color:var(--muted);word-break:break-all;background:var(--surface);border-radius:8px;padding:8px 10px;margin:8px 0;cursor:pointer;border:1px solid var(--border)}
-.copy-hint{font-size:.67rem;color:var(--gold);margin-top:4px}
 .divider{border:none;border-top:1px solid var(--border);margin:12px 0}
-
-/* TOAST */
-#toast{position:fixed;bottom:calc(76px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#000;padding:9px 20px;border-radius:25px;font-size:.81rem;font-weight:700;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+#toast{position:fixed;bottom:calc(76px + var(--sb));left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#000;padding:9px 20px;border-radius:25px;font-size:.81rem;font-weight:700;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px;padding-bottom:calc(20px + var(--safe-bottom));width:100%;max-width:520px;max-height:85vh;overflow-y:auto;animation:slideUp .22s}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px;padding-bottom:calc(20px + var(--sb));width:100%;max-width:520px;max-height:85vh;overflow-y:auto;animation:slideUp .22s}
 @keyframes slideUp{from{transform:translateY(40px)}to{transform:none}}
 .modal-title{font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--gold)}
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-icon{font-size:2.5rem;margin-bottom:10px}
-
-/* PIN PAD */
+.sync-bar{background:var(--card2);border-radius:8px;padding:8px 12px;font-size:.75rem;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.busy{background:var(--gold);animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+#lockOverlay{display:none;position:fixed;inset:0;background:rgba(8,14,20,.97);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#lockOverlay.show{display:flex}
 .pin-display{display:flex;justify-content:center;gap:12px;margin:16px 0}
 .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:background .2s}
 .pin-dot.filled{background:var(--gold);border-color:var(--gold)}
@@ -182,93 +103,52 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
 .pin-btn{background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:1.3rem;font-weight:700;padding:16px;cursor:pointer;transition:all .15s;font-family:inherit}
 .pin-btn:active{background:var(--gold-dim);border-color:var(--gold);transform:scale(.94)}
 </style>
-
 </head>
 <body>
 
-<!-- INSTALL BANNER -->
-
-<div id="installBanner">
-  <span>📲 ثبّت التطبيق على جهازك</span>
-  <button class="install-btn" onclick="installApp()">تثبيت</button>
-  <button style="background:none;border:none;color:#000;font-size:1.1rem;cursor:pointer;padding:0 6px" onclick="this.parentElement.classList.remove('show')">✕</button>
-</div>
-
-<!-- OFFLINE BADGE -->
-
-<div id="offlineBadge">📵 بدون إنترنت</div>
-
-<!-- AUTO-LOCK OVERLAY -->
+<!-- AUTO-LOCK -->
 
 <div id="lockOverlay">
-  <div class="lock-icon">🔒</div>
-  <p>انتهت جلسة المدير بسبب الخمول</p>
+  <div style="font-size:3rem">🔒</div>
+  <p style="color:var(--muted);font-size:.85rem">انتهت جلسة المدير</p>
   <button class="btn btn-gold" onclick="unlockAdmin()">🔑 إلغاء القفل</button>
 </div>
 
-<!-- ═══ LOGIN ═══ -->
+<!-- LOGIN -->
 
 <div id="loginScreen">
-  <!-- النقر السري: 🪙 أربع مرات ثم العنوان مرتين خلال 3 ثوانٍ -->
   <div class="login-logo" id="secretCoin" onclick="secretSeq('coin')">🪙</div>
   <div class="login-title" id="secretTitle" onclick="secretSeq('title')">نظام الجمعية</div>
-  <div class="login-sub">مرحباً بك</div>
-
-  <!-- واجهة الأعضاء -->
+  <div class="login-sub">اختر اسمك للدخول</div>
 
   <div class="login-box" id="memberBox">
     <label class="lf-label" style="text-align:center;font-size:.9rem;color:var(--text)">👋 اختر اسمك</label>
     <select id="memberSel"><option value="">-- اختر العضو --</option></select>
     <button class="btn btn-blue btn-block" onclick="memberLogin()">دخول</button>
+    <div id="syncBarLogin" style="margin-top:10px"></div>
   </div>
-
-  <!-- لوحة المدير السرية -->
 
   <div class="login-box" id="adminBox" style="display:none;border-color:var(--gold);margin-top:14px">
-    <div style="text-align:center;font-size:.82rem;color:var(--gold);margin-bottom:12px;font-weight:700">🔑 لوحة المدير</div>
-
-```
-<!-- خيارات الدخول -->
-<div id="adminLoginOptions">
-  <button class="btn btn-gold btn-block" onclick="showPwPanel()">🔐 كلمة المرور</button>
-  <button class="btn btn-block" id="bioBtn" onclick="biometricLogin()"
-    style="margin-top:8px;background:var(--surface);border:1px solid var(--green);color:var(--green);display:none">
-    <span style="font-size:1.1rem">👆</span> بصمة الإصبع
-  </button>
-  <button class="btn btn-muted btn-block" style="margin-top:8px" onclick="hideAdminBox()">إلغاء</button>
-</div>
-
-<!-- لوحة كلمة المرور -->
-<div id="pwPanel" style="display:none">
-  <label class="lf-label">كلمة مرور المدير</label>
-  <input type="password" id="adminPw" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')adminLogin()">
-  <button class="btn btn-gold btn-block" onclick="adminLogin()">دخول</button>
-  <button class="btn btn-muted btn-block" style="margin-top:6px" onclick="showAdminOptions()">رجوع</button>
-</div>
-
-<!-- PIN لوحة -->
-<div id="pinPanel" style="display:none">
-  <div style="text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:6px">أدخل رمز PIN المدير</div>
-  <div class="pin-display" id="pinDisplay">
-    <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
-    <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
-  </div>
-  <div class="pin-grid" id="pinGrid"></div>
-  <button class="btn btn-muted btn-block" style="margin-top:10px" onclick="showAdminOptions()">رجوع</button>
-</div>
-```
-
+    <div style="text-align:center;font-size:.82rem;color:var(--gold);margin-bottom:12px;font-weight:700">🔑 لوحة المدير السرية</div>
+    <div id="adminOptions">
+      <button class="btn btn-gold btn-block" onclick="showPwPanel()">🔐 كلمة المرور</button>
+      <button class="btn btn-muted btn-block" style="margin-top:8px" onclick="hideAdminBox()">إلغاء</button>
+    </div>
+    <div id="pwPanel" style="display:none">
+      <label class="lf-label">كلمة مرور المدير</label>
+      <input type="password" id="adminPw" placeholder="أدخل كلمة المرور" onkeydown="if(event.key==='Enter')adminLogin()">
+      <button class="btn btn-gold btn-block" onclick="adminLogin()">دخول</button>
+      <button class="btn btn-muted btn-block" style="margin-top:6px" onclick="showAdminOptions()">رجوع</button>
+    </div>
   </div>
 </div>
 
-<!-- ═══ MAIN APP ═══ -->
+<!-- MAIN APP -->
 
 <div id="mainApp" style="display:none">
   <div class="topbar">
     <div>
-      <div class="topbar-title">
-        <span id="syncDot"></span>🪙 نظام الجمعية
-      </div>
+      <div class="topbar-title">🪙 نظام الجمعية</div>
       <div class="topbar-sub" id="topSub">—</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
@@ -276,8 +156,6 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
       <button class="btn btn-muted btn-sm" onclick="logout()">خروج</button>
     </div>
   </div>
-
-  <!-- Admin tabs -->
 
   <div class="tabs" id="adminTabs">
     <div class="tab active" onclick="sw('pg-home',this)">🏠 الرئيسية</div>
@@ -287,31 +165,29 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
     <div class="tab" onclick="sw('pg-acc',this)">📊 الحسابات</div>
     <div class="tab" onclick="sw('pg-settings',this)">⚙️ الإعدادات</div>
   </div>
-
-  <!-- Member tabs -->
-
   <div class="tabs" id="memberTabs" style="display:none">
-    <div class="tab active" onclick="sw('pg-mv-me',this);renderMemberView()">📋 ملخصي</div>
-    <div class="tab" onclick="sw('pg-mv-months',this);renderMemberView()">📅 أشهري</div>
-    <div class="tab" onclick="sw('pg-mv-dist',this);renderMemberView()">💰 التوزيع</div>
+    <div class="tab active" onclick="sw('pg-mv-me',this);renderMV()">📋 ملخصي</div>
+    <div class="tab" onclick="sw('pg-mv-months',this);renderMV()">📅 أشهري</div>
+    <div class="tab" onclick="sw('pg-mv-dist',this);renderMV()">💰 التوزيع</div>
   </div>
 
-  <!-- ADMIN PAGES -->
-
   <div id="pg-home" class="page active">
+    <div id="syncBarApp" class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncTxt">جاري الاتصال...</span></div>
     <div class="stats-grid">
-      <div class="stat-box"><div class="stat-val" id="s-members" style="color:var(--green)">0</div><div class="stat-label">عضو</div></div>
-      <div class="stat-box"><div class="stat-val" id="s-months" style="color:var(--blue)">0</div><div class="stat-label">شهر</div></div>
-      <div class="stat-box"><div class="stat-val" id="s-col" style="color:var(--gold)">0</div><div class="stat-label">المحصّل</div></div>
-      <div class="stat-box"><div class="stat-val" id="s-pend" style="color:var(--red)">0</div><div class="stat-label">متأخر</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-m" style="color:var(--green)">0</div><div class="stat-label">عضو</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-mo" style="color:var(--blue)">0</div><div class="stat-label">شهر</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-c" style="color:var(--gold)">0</div><div class="stat-label">المحصّل</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-p" style="color:var(--red)">0</div><div class="stat-label">متأخر</div></div>
     </div>
     <div class="card" id="prog-card" style="display:none">
       <div class="card-title">📈 تقدم التوزيع</div>
       <div id="prog-body"></div>
     </div>
-    <div class="card" style="border-color:var(--green)">
-      <div class="card-title" style="color:var(--green)">☁️ حالة المزامنة</div>
-      <p style="font-size:.77rem;color:var(--muted)" id="syncStatus">جاري الاتصال...</p>
+    <div class="card" style="border-color:var(--blue)">
+      <div class="card-title" style="color:var(--blue)">📲 رابط الأعضاء</div>
+      <p style="font-size:.77rem;color:var(--muted);margin-bottom:8px">أرسل هذا الرابط — الأعضاء يرون بياناتهم فوراً</p>
+      <div style="background:var(--surface);border-radius:8px;padding:10px;font-size:.75rem;word-break:break-all;color:var(--blue)" id="shareUrlBox"></div>
+      <button class="btn btn-blue btn-block" style="margin-top:8px" onclick="copyShareUrl()">📋 نسخ الرابط</button>
     </div>
   </div>
 
@@ -327,7 +203,7 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
 
   <div id="pg-dist" class="page" style="display:none">
     <div class="card" style="border-color:var(--gold)">
-      <div class="card-title" style="color:var(--gold)">ℹ️ التوزيع الشهري</div>
+      <div class="card-title" style="color:var(--gold)">ℹ️ التوزيع</div>
       <p style="font-size:.77rem;color:var(--muted)">السهم: <b style="color:var(--gold)" id="totalLbl">—</b></p>
     </div>
     <div id="dList"></div>
@@ -335,7 +211,7 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
 
   <div id="pg-pay" class="page" style="display:none">
     <div class="card" style="border-color:var(--blue)">
-      <div class="card-title" style="color:var(--blue)">ℹ️ الدفعات الشهرية</div>
+      <div class="card-title" style="color:var(--blue)">ℹ️ الدفعات</div>
       <p style="font-size:.77rem;color:var(--muted)">يمكن تعديل مبلغ كل شخص بحرية.</p>
     </div>
     <div id="pList"></div>
@@ -355,25 +231,8 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
     <div class="card" style="border-color:var(--gold)">
       <div class="card-title" style="color:var(--gold)">🔑 تغيير كلمة المرور</div>
       <input type="password" id="pw1" placeholder="كلمة المرور الجديدة">
-      <input type="password" id="pw2" placeholder="تأكيد كلمة المرور">
+      <input type="password" id="pw2" placeholder="تأكيد">
       <button class="btn btn-gold btn-block" onclick="changePw()">تغيير</button>
-    </div>
-    <div class="card" style="border-color:var(--blue)">
-      <div class="card-title" style="color:var(--blue)">🔢 رمز PIN للمدير</div>
-      <p style="font-size:.77rem;color:var(--muted);margin-bottom:8px">رمز PIN احتياطي من 4 أرقام للدخول السريع</p>
-      <button class="btn btn-blue btn-block" onclick="setupPIN()">⚙️ تعيين PIN جديد</button>
-      <button class="btn btn-muted btn-block" style="margin-top:6px" onclick="localStorage.removeItem('jameya_pin');toast('✔ تم حذف PIN')">🗑 حذف PIN</button>
-    </div>
-    <div class="card" style="border-color:var(--green)">
-      <div class="card-title" style="color:var(--green)">👆 إعدادات البصمة</div>
-      <button class="btn btn-green btn-block" onclick="doRegisterBio()">🔄 تسجيل البصمة</button>
-      <button class="btn btn-red btn-block" style="margin-top:6px" onclick="localStorage.removeItem('jameya_bio');document.getElementById('bioBtn').style.display='none';toast('✔ تم حذف البصمة')">🗑 حذف البصمة</button>
-    </div>
-    <div class="card">
-      <div class="card-title">☁️ Firebase</div>
-      <p style="font-size:.75rem;color:var(--muted);margin-bottom:8px">معرّف غرفة الجمعية في قاعدة البيانات:</p>
-      <input id="fbRoom" placeholder="مثال: jameya-2025" style="direction:ltr">
-      <button class="btn btn-blue btn-block" onclick="setRoom()">🔗 تطبيق الغرفة</button>
     </div>
     <div class="card" style="border-color:var(--red)">
       <div class="card-title" style="color:var(--red)">⚠️ خطر</div>
@@ -381,14 +240,10 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
     </div>
   </div>
 
-  <!-- MEMBER PAGES -->
-
   <div id="pg-mv-me" class="page" style="display:none"><div id="mvMe"></div></div>
   <div id="pg-mv-months" class="page" style="display:none"><div id="mvMonths"></div></div>
   <div id="pg-mv-dist" class="page" style="display:none"><div id="mvDist"></div></div>
 </div>
-
-<!-- CONFIRM MODAL -->
 
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
@@ -400,540 +255,302 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
     </div>
   </div>
 </div>
-
-<!-- PIN SETUP MODAL -->
-
-<div class="modal-overlay" id="pinSetupModal">
-  <div class="modal-box">
-    <div class="modal-title">🔢 تعيين رمز PIN</div>
-    <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px" id="pinSetupMsg">أدخل رمز PIN جديد من 4 أرقام</p>
-    <div class="pin-display" id="pinSetupDisplay">
-      <div class="pin-dot" id="spd0"></div><div class="pin-dot" id="spd1"></div>
-      <div class="pin-dot" id="spd2"></div><div class="pin-dot" id="spd3"></div>
-    </div>
-    <div class="pin-grid" id="pinSetupGrid"></div>
-    <button class="btn btn-muted btn-block" style="margin-top:10px" onclick="closeModal('pinSetupModal');pinSetupStep=0;pinSetupFirst=''">إلغاء</button>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-// ⚙️ FIREBASE CONFIG — ضع إعداداتك هنا
-// ══════════════════════════════════════════════
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDkxDW9W9Sx718IN0BV1My4P-B5PG6-xpE",
-  authDomain: "jameya-app-9a672.firebaseapp.com",
-  databaseURL: "https://jameya-app-9a672-default-rtdb.firebaseio.com",
-  projectId: "jameya-app-9a672",
-  storageBucket: "jameya-app-9a672.firebasestorage.app",
-  messagingSenderId: "155607019453",
-  appId: "1:155607019453:web:e9757b3e56439e67082cd4",
-  measurementId: "G-W6WR0CNTS3"
-};
+// ══════════════════════════════════════════
+// ⚙️ JSONBin CONFIG — مجاني بدون إعداد
+// ══════════════════════════════════════════
+// سيتم إنشاء bin تلقائياً عند أول استخدام
+const JSONBIN_API = 'https://api.jsonbin.io/v3';
+const JSONBIN_KEY = '$2a$10$'; // سيُستبدل تلقائياً
+let BIN_ID = localStorage.getItem('jameya_bin_id') || '';
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // STATE
-// ══════════════════════════════════════════════
-let D = {
-  months:12, totalPerMonth:2500,
-  adminPasswordHash: '', // SHA-256 hash of password
-  members:[], dist:[], pay:[]
-};
-let ROLE=null, ME='';
-let fbApp=null, fbDb=null, fbRef=null, fbRoom='';
-let autoLockTimer=null;
-const AUTO_LOCK_MS = 2 * 60 * 1000; // 2 دقيقة
+// ══════════════════════════════════════════
+let D = {months:12,totalPerMonth:2500,adminPassword:'1234',members:[],dist:[],pay:[]};
+let ROLE=null, ME='', autoLockTimer=null;
+const AUTO_LOCK = 2*60*1000;
 
-// ══════════════════════════════════════════════
-// SHA-256
-// ══════════════════════════════════════════════
-async function sha256(msg) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-async function hashMatch(plain, hash) {
-  return (await sha256(plain)) === hash;
-}
-
-// ══════════════════════════════════════════════
-// FIREBASE INIT
-// ══════════════════════════════════════════════
-function initFirebase() {
-  try {
-    if (!firebase || FIREBASE_CONFIG.apiKey.includes('REPLACE')) {
-      setSyncStatus('لم يتم ربط Firebase بعد — البيانات محلية فقط', false);
-      return;
-    }
-    fbApp = firebase.initializeApp(FIREBASE_CONFIG);
-    fbDb  = firebase.database();
-    fbRoom = localStorage.getItem('jameya_room') || 'jameya-default';
-    connectRoom(fbRoom);
-  } catch(e) {
-    setSyncStatus('خطأ في الاتصال بـ Firebase', false);
-  }
-}
-
-function connectRoom(room) {
-  if (!fbDb) return;
-  if (fbRef) fbRef.off(); // detach old listener
-  fbRoom = room;
-  localStorage.setItem('jameya_room', room);
-  fbRef = fbDb.ref('rooms/' + room + '/data');
-  setSyncDot('syncing');
-
-  fbRef.on('value', snap => {
-    const val = snap.val();
-    if (val) {
-      const localPwHash = D.adminPasswordHash;
-      D = { ...val, adminPasswordHash: localPwHash || val.adminPasswordHash };
-      sync();
-      localStorage.setItem('jv3', JSON.stringify(D));
-    }
-    setSyncDot('synced');
-    setSyncStatus('متصل — غرفة: ' + room, true);
-
-    // Always update member select when data arrives
-    populateMemberSel();
-    if (ROLE === 'admin') render();
-    if (ROLE === 'member') renderMemberView();
-  }, err => {
-    setSyncDot('');
-    setSyncStatus('خطأ: ' + err.message, false);
-
-  });
-}
-
-function pushToFirebase() {
-  if (!fbRef) return;
-  setSyncDot('syncing');
-  fbRef.set(D).then(() => setSyncDot('synced')).catch(()=> setSyncDot(''));
-}
-
-function setSyncDot(state) {
-  const d = document.getElementById('syncDot');
-  if (!d) return;
-  d.className = state ? 'synced' === state ? 'synced' : state : '';
-  d.id = 'syncDot';
-}
-function setSyncStatus(msg, ok) {
-  const el = document.getElementById('syncStatus');
-  if (el) { el.textContent = msg; el.style.color = ok ? 'var(--green)' : 'var(--muted)'; }
-}
-
-function setRoom() {
-  const r = document.getElementById('fbRoom').value.trim();
-  if (!r) return toast('أدخل اسم الغرفة');
-  connectRoom(r);
-  toast('✔ تم الاتصال بالغرفة: ' + r);
-}
-
-// ══════════════════════════════════════════════
-// LOCAL STORAGE
-// ══════════════════════════════════════════════
-function load() {
-  try { const r=localStorage.getItem('jv3'); if(r) D=JSON.parse(r); } catch(e) {}
-  // If no hash stored yet, hash default password "1234"
-  if (!D.adminPasswordHash) {
-    sha256('1234').then(h => { D.adminPasswordHash=h; saveLocal(); });
-  }
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
+function loadLocal(){
+  try{const r=localStorage.getItem('jv4');if(r)D=JSON.parse(r);}catch(e){}
   sync();
 }
-function sync() {
-  while (D.dist.length < D.months) D.dist.push({winners:[]});
-  while (D.pay.length < D.months) {
-    const r={}; D.members.forEach(m=>r[m.n]={amount:m.a,paid:false,date:''}); D.pay.push(r);
-  }
-  D.dist.length=D.months; D.pay.length=D.months;
+function sync(){
+  while(D.dist.length<D.months)D.dist.push({winners:[]});
+  while(D.pay.length<D.months){const r={};D.members.forEach(m=>r[m.n]={amount:m.a,paid:false,date:''});D.pay.push(r);}
+  D.dist.length=D.months;D.pay.length=D.months;
 }
-function saveLocal() { localStorage.setItem('jv3',JSON.stringify(D)); }
-function save() { saveLocal(); render(); pushToFirebase(); }
+function saveLocal(){localStorage.setItem('jv4',JSON.stringify(D));}
 
-// ══════════════════════════════════════════════
-// SECRET SEQUENCE: 🪙x4 then titleX2 within 3s
-// ══════════════════════════════════════════════
-let _seq=[], _seqTimer=null;
-function secretSeq(type) {
-  clearTimeout(_seqTimer);
+// ══════════════════════════════════════════
+// CLOUD SYNC — JSONBin
+// ══════════════════════════════════════════
+let syncTimeout=null;
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(dot){dot.className='sync-dot'+(state==='ok'?' ok':state==='busy'?' busy':'');}
+  if(txt)txt.textContent=msg;
+}
+
+async function pushCloud(){
+  setSyncStatus('busy','جاري الحفظ...');
+  try{
+    if(!BIN_ID){
+      // Create new bin
+      const r=await fetch(JSONBIN_API+'/b',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-Bin-Private':'false'},
+        body:JSON.stringify(D)
+      });
+      const j=await r.json();
+      BIN_ID=j.metadata.id;
+      localStorage.setItem('jameya_bin_id',BIN_ID);
+      // Update share URL
+      updateShareUrl();
+    } else {
+      await fetch(JSONBIN_API+'/b/'+BIN_ID,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(D)
+      });
+    }
+    setSyncStatus('ok','متزامن ✔');
+  }catch(e){
+    setSyncStatus('','خطأ في الحفظ');
+  }
+}
+
+async function pullCloud(){
+  if(!BIN_ID)return;
+  setSyncStatus('busy','جاري التحديث...');
+  try{
+    const r=await fetch(JSONBIN_API+'/b/'+BIN_ID+'/latest');
+    const j=await r.json();
+    const pw=D.adminPassword;
+    D={...j.record, adminPassword: pw};
+    sync();
+    saveLocal();
+    populateMemberSel();
+    if(ROLE==='admin')render();
+    if(ROLE==='member')renderMV();
+    setSyncStatus('ok','متزامن ✔');
+  }catch(e){
+    setSyncStatus('','تعذّر التحديث');
+  }
+}
+
+function save(){
+  saveLocal();
+  render();
+  clearTimeout(syncTimeout);
+  syncTimeout=setTimeout(pushCloud,800);
+}
+
+// Auto-refresh every 30s for members
+let pullInterval=null;
+function startPullInterval(){
+  if(pullInterval)clearInterval(pullInterval);
+  pullInterval=setInterval(()=>{if(BIN_ID)pullCloud();},30000);
+}
+
+function updateShareUrl(){
+  const url=location.href.split('?')[0]+(BIN_ID?'?b='+BIN_ID:'');
+  const el=document.getElementById('shareUrlBox');
+  if(el)el.textContent=url;
+}
+
+function copyShareUrl(){
+  const url=document.getElementById('shareUrlBox')?.textContent||location.href;
+  navigator.clipboard.writeText(url).then(()=>toast('✔ تم نسخ الرابط'))
+  .catch(()=>{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);toast('✔ تم النسخ');});
+}
+
+// Check URL for bin ID
+function checkUrl(){
+  const p=new URLSearchParams(location.search);
+  const b=p.get('b');
+  if(b&&b!==BIN_ID){
+    BIN_ID=b;
+    localStorage.setItem('jameya_bin_id',b);
+    pullCloud().then(()=>populateMemberSel());
+  }
+}
+
+// ══════════════════════════════════════════
+// SECRET SEQUENCE
+// ══════════════════════════════════════════
+let _seq=[],_seqT=null;
+function secretSeq(type){
+  clearTimeout(_seqT);
   _seq.push(type);
-  _seqTimer = setTimeout(()=>{ _seq=[]; }, 3000);
-  // Pattern: coin,coin,coin,coin,title,title
-  if (_seq.length>=6) {
-    const last6 = _seq.slice(-6);
-    if (last6[0]==='coin'&&last6[1]==='coin'&&last6[2]==='coin'&&last6[3]==='coin'&&
-        last6[4]==='title'&&last6[5]==='title') {
-      _seq=[];
-      clearTimeout(_seqTimer);
+  _seqT=setTimeout(()=>{_seq=[];},3000);
+  if(_seq.length>=6){
+    const l=_seq.slice(-6);
+    if(l[0]==='coin'&&l[1]==='coin'&&l[2]==='coin'&&l[3]==='coin'&&l[4]==='title'&&l[5]==='title'){
+      _seq=[];clearTimeout(_seqT);
       showAdminBox();
     }
   }
 }
-function showAdminBox() {
-  document.getElementById('adminBox').style.display='';
-  showAdminOptions();
-  initBioBtn();
-}
-function hideAdminBox() {
-  document.getElementById('adminBox').style.display='none';
-  document.getElementById('adminPw').value='';
-  showAdminOptions();
-}
-function showAdminOptions() {
-  document.getElementById('adminLoginOptions').style.display='';
-  document.getElementById('pwPanel').style.display='none';
-  document.getElementById('pinPanel').style.display='none';
-}
-function showPwPanel() {
-  document.getElementById('adminLoginOptions').style.display='none';
-  document.getElementById('pwPanel').style.display='';
-  document.getElementById('pinPanel').style.display='none';
-  document.getElementById('adminPw').focus();
-}
+function showAdminBox(){document.getElementById('adminBox').style.display='';showAdminOptions();}
+function hideAdminBox(){document.getElementById('adminBox').style.display='none';document.getElementById('adminPw').value='';}
+function showAdminOptions(){document.getElementById('adminOptions').style.display='';document.getElementById('pwPanel').style.display='none';}
+function showPwPanel(){document.getElementById('adminOptions').style.display='none';document.getElementById('pwPanel').style.display='';document.getElementById('adminPw').focus();}
 
-// ══════════════════════════════════════════════
-// ADMIN LOGIN
-// ══════════════════════════════════════════════
-async function adminLogin() {
-  const pw = document.getElementById('adminPw').value;
-  const match = await hashMatch(pw, D.adminPasswordHash);
-  if (!match) { toast('❌ كلمة المرور خاطئة'); return; }
-  hideAdminBox();
-  enterAdmin();
-  offerBiometric();
-}
-
-function enterAdmin() {
-  ROLE='admin';
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+function adminLogin(){
+  if(document.getElementById('adminPw').value!==D.adminPassword){toast('❌ كلمة المرور خاطئة');return;}
+  hideAdminBox();ROLE='admin';
   startApp('👑 مدير','role-admin','وضع الإدارة الكاملة',true);
   resetAutoLock();
 }
-
-// ══════════════════════════════════════════════
-// CHANGE PASSWORD (SHA-256)
-// ══════════════════════════════════════════════
-async function changePw() {
-  const p1=document.getElementById('pw1').value, p2=document.getElementById('pw2').value;
-  if (!p1) return toast('أدخل كلمة المرور');
-  if (p1!==p2) return toast('كلمتا المرور غير متطابقتين');
-  D.adminPasswordHash = await sha256(p1);
-  document.getElementById('pw1').value=''; document.getElementById('pw2').value='';
-  save(); toast('✔ تم تغيير كلمة المرور');
+function memberLogin(){
+  const n=document.getElementById('memberSel').value;
+  if(!n){toast('اختر اسمك أولاً');return;}
+  ROLE='member';ME=n;
+  startApp('👤 '+n,'role-member','عرض فقط',false);
+  startPullInterval();
 }
-
-// ══════════════════════════════════════════════
-// PIN
-// ══════════════════════════════════════════════
-let pinEntry='', pinSetupStep=0, pinSetupFirst='';
-
-function buildPinPad(gridId, dotPrefix, onDigit, onDel) {
-  const grid=document.getElementById(gridId);
-  grid.innerHTML='';
-  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k=>{
-    const b=document.createElement('button');
-    b.className='pin-btn';
-    b.textContent=k===''?'':k;
-    if(k==='') { b.style.visibility='hidden'; }
-    else if(k==='⌫') b.onclick=onDel;
-    else b.onclick=()=>onDigit(String(k));
-    grid.appendChild(b);
-  });
-}
-
-function showPinPanel() {
-  document.getElementById('adminLoginOptions').style.display='none';
-  document.getElementById('pwPanel').style.display='none';
-  document.getElementById('pinPanel').style.display='';
-  pinEntry='';
-  updatePinDisplay('pinDisplay','pd');
-  buildPinPad('pinGrid','pd',
-    d=>{ if(pinEntry.length<4){pinEntry+=d;updatePinDisplay('pinDisplay','pd');if(pinEntry.length===4)verifyPIN(); }},
-    ()=>{ pinEntry=pinEntry.slice(0,-1);updatePinDisplay('pinDisplay','pd'); }
-  );
-}
-
-function updatePinDisplay(dispId, pfx) {
-  for(let i=0;i<4;i++) {
-    const d=document.getElementById(pfx+i);
-    if(d) d.className='pin-dot'+(i<pinEntry.length?' filled':'');
-  }
-}
-
-async function verifyPIN() {
-  const stored=localStorage.getItem('jameya_pin');
-  if (!stored) { toast('لم يتم تعيين PIN'); showAdminOptions(); return; }
-  const h=await sha256(pinEntry);
-  if (h===stored) {
-    hideAdminBox(); enterAdmin();
-  } else {
-    toast('❌ PIN خاطئ'); pinEntry=''; updatePinDisplay('pinDisplay','pd');
-  }
-}
-
-function setupPIN() {
-  pinSetupStep=0; pinSetupFirst=''; pinEntry='';
-  buildPinPad('pinSetupGrid','spd',
-    d=>{ if(pinEntry.length<4){pinEntry+=d;updatePinDisplay('pinSetupDisplay','spd');if(pinEntry.length===4)nextPinStep(); }},
-    ()=>{ pinEntry=pinEntry.slice(0,-1);updatePinDisplay('pinSetupDisplay','spd'); }
-  );
-  document.getElementById('pinSetupMsg').textContent='أدخل رمز PIN جديد من 4 أرقام';
-  updatePinDisplay('pinSetupDisplay','spd');
-  openModal('pinSetupModal');
-}
-
-async function nextPinStep() {
-  if (pinSetupStep===0) {
-    pinSetupFirst=pinEntry; pinEntry='';
-    pinSetupStep=1;
-    document.getElementById('pinSetupMsg').textContent='أعد إدخال PIN للتأكيد';
-    updatePinDisplay('pinSetupDisplay','spd');
-  } else {
-    if (pinEntry===pinSetupFirst) {
-      const h=await sha256(pinEntry);
-      localStorage.setItem('jameya_pin',h);
-      closeModal('pinSetupModal');
-      toast('✔ تم حفظ PIN بنجاح');
-      // show PIN option in admin box
-      document.getElementById('adminLoginOptions').innerHTML = buildAdminOptions();
-    } else {
-      toast('❌ PIN غير متطابق');
-      pinEntry=''; pinSetupStep=0; pinSetupFirst='';
-      document.getElementById('pinSetupMsg').textContent='أدخل رمز PIN جديد من 4 أرقام';
-      updatePinDisplay('pinSetupDisplay','spd');
-    }
-  }
-}
-
-function buildAdminOptions() {
-  const hasBio=!!localStorage.getItem('jameya_bio');
-  const hasPin=!!localStorage.getItem('jameya_pin');
-  return `
-    <button class="btn btn-gold btn-block" onclick="showPwPanel()">🔐 كلمة المرور</button>
-    ${hasPin?`<button class="btn btn-block" onclick="showPinPanel()" style="margin-top:8px;background:var(--surface);border:1px solid var(--blue);color:var(--blue)">🔢 رمز PIN</button>`:''}
-    ${hasBio?`<button class="btn btn-block" id="bioBtn" onclick="biometricLogin()" style="margin-top:8px;background:var(--surface);border:1px solid var(--green);color:var(--green)"><span style="font-size:1.1rem">👆</span> بصمة الإصبع</button>`:''}
-    <button class="btn btn-muted btn-block" style="margin-top:8px" onclick="hideAdminBox()">إلغاء</button>`;
-}
-
-// ══════════════════════════════════════════════
-// BIOMETRIC (WebAuthn)
-// ══════════════════════════════════════════════
-const BIO_KEY='jameya_bio';
-
-async function isBioSupported() {
-  if (!window.PublicKeyCredential) return false;
-  try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
-  catch(e){ return false; }
-}
-
-async function initBioBtn() {
-  const s=await isBioSupported();
-  const stored=localStorage.getItem(BIO_KEY);
-  const btn=document.getElementById('bioBtn');
-  if (s&&stored&&btn) btn.style.display='';
-  // rebuild options
-  document.getElementById('adminLoginOptions').innerHTML=buildAdminOptions();
-}
-
-async function offerBiometric() {
-  if (!await isBioSupported()) return;
-  if (localStorage.getItem(BIO_KEY)) return;
-  setTimeout(()=>{
-    confirm2('👆 تفعيل البصمة','هل تريد تفعيل بصمة الإصبع للدخول السريع؟',()=>doRegisterBio());
-  },700);
-}
-
-async function doRegisterBio() {
-  if (!await isBioSupported()) { toast('⚠️ البصمة غير مدعومة على هذا المتصفح'); return; }
-  try {
-    const challenge=crypto.getRandomValues(new Uint8Array(32));
-    const uid=crypto.getRandomValues(new Uint8Array(16));
-    const cred=await navigator.credentials.create({
-      publicKey:{
-        challenge, rp:{name:'الجمعية'},
-        user:{id:uid,name:'admin',displayName:'المدير'},
-        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},
-        timeout:60000
-      }
-    });
-    if (cred) {
-      localStorage.setItem(BIO_KEY,JSON.stringify({id:btoa(String.fromCharCode(...new Uint8Array(cred.rawId)))}));
-      toast('✔ تم تسجيل البصمة');
-      document.getElementById('adminLoginOptions').innerHTML=buildAdminOptions();
-    }
-  } catch(e){ if(e.name!=='NotAllowedError') toast('⚠️ تعذّر تسجيل البصمة'); }
-}
-
-async function biometricLogin() {
-  const stored=localStorage.getItem(BIO_KEY);
-  if (!stored) { toast('سجّل البصمة أولاً من الإعدادات'); return; }
-  try {
-    const cd=JSON.parse(stored);
-    const rawId=Uint8Array.from(atob(cd.id),c=>c.charCodeAt(0));
-    const challenge=crypto.getRandomValues(new Uint8Array(32));
-    const assertion=await navigator.credentials.get({
-      publicKey:{challenge,allowCredentials:[{id:rawId,type:'public-key'}],userVerification:'required',timeout:60000}
-    });
-    if (assertion) { hideAdminBox(); enterAdmin(); toast('✔ تم الدخول بالبصمة'); }
-  } catch(e){ toast(e.name==='NotAllowedError'?'❌ تم رفض البصمة':'❌ فشل التحقق'); }
-}
-
-// ══════════════════════════════════════════════
-// AUTO-LOCK (2 دقيقة خمول)
-// ══════════════════════════════════════════════
-function resetAutoLock() {
-  clearTimeout(autoLockTimer);
-  if (ROLE!=='admin') return;
-  autoLockTimer=setTimeout(()=>{
-    document.getElementById('lockOverlay').classList.add('show');
-  }, AUTO_LOCK_MS);
-}
-function unlockAdmin() {
-  document.getElementById('lockOverlay').classList.remove('show');
-  showAdminBox();
-  showPwPanel();
-}
-// Reset on any touch/click
-document.addEventListener('touchstart',()=>resetAutoLock(),{passive:true});
-document.addEventListener('click',()=>resetAutoLock());
-
-// ══════════════════════════════════════════════
-// MEMBER LOGIN
-// ══════════════════════════════════════════════
-function populateMemberSel() {
+function populateMemberSel(){
   const s=document.getElementById('memberSel');
   s.innerHTML='<option value="">-- اختر العضو --</option>';
   D.members.forEach(m=>{const o=document.createElement('option');o.value=m.n;o.textContent=m.n;s.appendChild(o);});
 }
-function memberLogin() {
-  const n=document.getElementById('memberSel').value;
-  if (!n) { toast('اختر اسمك أولاً'); return; }
-  ROLE='member'; ME=n;
-  startApp('👤 '+n,'role-member','عرض فقط — لا تعديل',false);
-}
-
-// ══════════════════════════════════════════════
-// APP START / LOGOUT
-// ══════════════════════════════════════════════
-function startApp(badge,badgeClass,sub,isAdmin) {
+function startApp(badge,bClass,sub,isAdmin){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='';
-  document.getElementById('roleBadge').className='role-badge '+badgeClass;
+  document.getElementById('roleBadge').className='role-badge '+bClass;
   document.getElementById('roleBadge').textContent=badge;
   document.getElementById('topSub').textContent=sub;
   document.getElementById('adminTabs').style.display=isAdmin?'':'none';
   document.getElementById('memberTabs').style.display=isAdmin?'none':'';
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
-  if (isAdmin) {
+  if(isAdmin){
     ['pg-home','pg-members','pg-dist','pg-pay','pg-acc','pg-settings'].forEach(id=>document.getElementById(id).style.display='');
     document.getElementById('pg-home').classList.add('active');
     document.querySelectorAll('#adminTabs .tab').forEach((t,i)=>t.classList.toggle('active',i===0));
     document.getElementById('cfg-months').value=D.months;
     document.getElementById('cfg-total').value=D.totalPerMonth;
-    document.getElementById('fbRoom').value=fbRoom;
+    updateShareUrl();
     render();
-  } else {
+    if(BIN_ID)pullCloud();
+  }else{
     ['pg-mv-me','pg-mv-months','pg-mv-dist'].forEach(id=>document.getElementById(id).style.display='');
     document.getElementById('pg-mv-me').classList.add('active');
     document.querySelectorAll('#memberTabs .tab').forEach((t,i)=>t.classList.toggle('active',i===0));
-    renderMemberView();
+    renderMV();
   }
 }
-
-function logout() {
-  ROLE=null; ME=''; clearTimeout(autoLockTimer);
+function logout(){
+  ROLE=null;ME='';clearTimeout(autoLockTimer);if(pullInterval)clearInterval(pullInterval);
   document.getElementById('lockOverlay').classList.remove('show');
   document.getElementById('mainApp').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
-  document.getElementById('adminPw').value='';
-  hideAdminBox(); populateMemberSel();
+  document.getElementById('adminPw').value='';hideAdminBox();populateMemberSel();
 }
+function resetAutoLock(){
+  clearTimeout(autoLockTimer);if(ROLE!=='admin')return;
+  autoLockTimer=setTimeout(()=>document.getElementById('lockOverlay').classList.add('show'),AUTO_LOCK);
+}
+function unlockAdmin(){document.getElementById('lockOverlay').classList.remove('show');showAdminBox();showPwPanel();}
+document.addEventListener('touchstart',()=>resetAutoLock(),{passive:true});
+document.addEventListener('click',()=>resetAutoLock());
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // NAV
-// ══════════════════════════════════════════════
-function sw(id,el) {
+// ══════════════════════════════════════════
+function sw(id,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const grp=ROLE==='admin'?'#adminTabs .tab':'#memberTabs .tab';
-  document.querySelectorAll(grp).forEach(t=>t.classList.remove('active'));
+  const g=ROLE==='admin'?'#adminTabs .tab':'#memberTabs .tab';
+  document.querySelectorAll(g).forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // CONFIG
-// ══════════════════════════════════════════════
-function applyCfg() {
+// ══════════════════════════════════════════
+function applyCfg(){
   D.months=parseInt(document.getElementById('cfg-months').value)||12;
   D.totalPerMonth=parseFloat(document.getElementById('cfg-total').value)||2500;
-  sync(); save(); toast('✔ تم تطبيق الإعدادات');
+  sync();save();toast('✔ تم التطبيق');
+}
+function changePw(){
+  const p1=document.getElementById('pw1').value,p2=document.getElementById('pw2').value;
+  if(!p1)return toast('أدخل كلمة المرور');
+  if(p1!==p2)return toast('كلمتا المرور غير متطابقتين');
+  D.adminPassword=p1;document.getElementById('pw1').value='';document.getElementById('pw2').value='';
+  save();toast('✔ تم التغيير');
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // MEMBERS
-// ══════════════════════════════════════════════
-function addM() {
+// ══════════════════════════════════════════
+function addM(){
   const n=document.getElementById('mName').value.trim();
   const a=parseFloat(document.getElementById('mAmt').value)||0;
-  if (!n) return toast('أدخل اسم العضو');
-  if (!a) return toast('أدخل مبلغ القسط');
-  if (D.members.find(m=>m.n===n)) return toast('الاسم موجود مسبقاً');
+  if(!n)return toast('أدخل اسم العضو');
+  if(!a)return toast('أدخل مبلغ القسط');
+  if(D.members.find(m=>m.n===n))return toast('الاسم موجود مسبقاً');
   D.members.push({n,a});
-  document.getElementById('mName').value=''; document.getElementById('mAmt').value='';
+  document.getElementById('mName').value='';document.getElementById('mAmt').value='';
   D.pay.forEach(r=>{if(!r[n])r[n]={amount:a,paid:false,date:''};});
-  save();
-  toast('✔ تمت إضافة العضو');
+  save();toast('✔ تمت الإضافة');
 }
-function delM(i) {
+function delM(i){
   confirm2('حذف العضو؟','سيتم حذف العضو من جميع الأشهر.',()=>{
-    const name=D.members[i].n; D.members.splice(i,1);
+    const name=D.members[i].n;D.members.splice(i,1);
     D.pay.forEach(r=>delete r[name]);
     D.dist.forEach(d=>{d.winners=d.winners.filter(w=>w.name!==name);});
-    save(); toast('✔ تم الحذف');
+    save();toast('✔ تم الحذف');
   });
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // DISTRIBUTION
-// ══════════════════════════════════════════════
-function toggleWinner(mi,name) {
+// ══════════════════════════════════════════
+function toggleWinner(mi,name){
   const w=D.dist[mi].winners;
   const idx=w.findIndex(x=>x.name===name);
-  if (idx===-1) {
-    const today=new Date().toLocaleDateString('ar-SA');
-    w.push({name,amount:0,date:today});
-  } else w.splice(idx,1);
-  if (w.length){const s=Math.round(D.totalPerMonth/w.length*100)/100;w.forEach(x=>x.amount=s);}
+  if(idx===-1){w.push({name,amount:0,date:new Date().toLocaleDateString('ar-SA')});}
+  else w.splice(idx,1);
+  if(w.length){const s=Math.round(D.totalPerMonth/w.length*100)/100;w.forEach(x=>x.amount=s);}
   save();
 }
 function setWAmt(mi,wi,v){D.dist[mi].winners[wi].amount=parseFloat(v)||0;}
 function setWDate(mi,wi,v){D.dist[mi].winners[wi].date=v;}
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // PAYMENTS
-// ══════════════════════════════════════════════
-function togglePaid(mi,name) {
+// ══════════════════════════════════════════
+function togglePaid(mi,name){
   D.pay[mi][name].paid=!D.pay[mi][name].paid;
   D.pay[mi][name].date=D.pay[mi][name].paid?new Date().toLocaleDateString('ar-SA'):'';
   save();
 }
 function setPAmt(mi,name,v){D.pay[mi][name].amount=parseFloat(v)||0;}
 
-// ══════════════════════════════════════════════
-// RENDER — ADMIN
-// ══════════════════════════════════════════════
-function render() {
-  if (ROLE!=='admin') return;
+// ══════════════════════════════════════════
+// RENDER ADMIN
+// ══════════════════════════════════════════
+function render(){
+  if(ROLE!=='admin')return;
   let col=0,pend=0;
-  D.pay.forEach(r=>D.members.forEach(m=>{
-    if(r[m.n]){if(r[m.n].paid)col+=r[m.n].amount;else pend+=r[m.n].amount;}
-  }));
-  document.getElementById('s-members').textContent=D.members.length;
-  document.getElementById('s-months').textContent=D.months;
-  document.getElementById('s-col').textContent=fN(col);
-  document.getElementById('s-pend').textContent=fN(pend);
+  D.pay.forEach(r=>D.members.forEach(m=>{if(r[m.n]){if(r[m.n].paid)col+=r[m.n].amount;else pend+=r[m.n].amount;}}));
+  document.getElementById('s-m').textContent=D.members.length;
+  document.getElementById('s-mo').textContent=D.months;
+  document.getElementById('s-c').textContent=fN(col);
+  document.getElementById('s-p').textContent=fN(pend);
   const done=D.dist.filter(d=>d.winners.length).length;
-  if (D.months) {
+  if(D.months){
     document.getElementById('prog-card').style.display='';
     const pct=Math.round(done/D.months*100);
     document.getElementById('prog-body').innerHTML=
@@ -943,6 +560,9 @@ function render() {
        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`;
   }
   document.getElementById('totalLbl').textContent=fN(D.totalPerMonth);
+  document.getElementById('cfg-months').value=D.months;
+  document.getElementById('cfg-total').value=D.totalPerMonth;
+  updateShareUrl();
 
   // Members
   document.getElementById('mList').innerHTML=!D.members.length
@@ -959,8 +579,7 @@ function render() {
     :D.dist.map((mo,mi)=>{
       const w=mo.winners,hasW=w.length>0;
       const wT=w.reduce((s,x)=>s+x.amount,0),rem=D.totalPerMonth-wT;
-      return `
-      <div class="month-card">
+      return `<div class="month-card">
         <div class="month-header" onclick="toggle('db-${mi}')">
           <div><span class="month-title">شهر ${mi+1}</span>
             ${hasW?`<span class="chip" style="margin-right:4px">${w.map(x=>x.name).join('، ')}</span>`
@@ -968,32 +587,19 @@ function render() {
           </div><span style="color:var(--muted)">▾</span>
         </div>
         <div class="month-body" id="db-${mi}">
-          <p style="font-size:.73rem;color:var(--muted);margin-bottom:8px">
-            السهم: <b style="color:var(--gold)">${fN(D.totalPerMonth)}</b>
-            ${hasW?` | متبقي: <b style="color:var(--red)">${fN(rem)}</b>`:''}
-          </p>
+          <p style="font-size:.73rem;color:var(--muted);margin-bottom:8px">السهم: <b style="color:var(--gold)">${fN(D.totalPerMonth)}</b>${hasW?` | متبقي: <b style="color:var(--red)">${fN(rem)}</b>`:''}</p>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
             ${D.members.map(m=>{const sel=w.find(x=>x.name===m.n);
-              return `<button class="btn btn-sm ${sel?'btn-green':'btn-blue'}" onclick="toggleWinner(${mi},'${m.n}')">
-                ${sel?'✔ ':'+'}${m.n}</button>`;}).join('')}
+              return `<button class="btn btn-sm ${sel?'btn-green':'btn-blue'}" onclick="toggleWinner(${mi},'${m.n}')">${sel?'✔ ':'+'}${m.n}</button>`;}).join('')}
           </div>
-          ${hasW?`
-            <table>
-              <tr><th>المستلم</th><th>المبلغ</th><th>تاريخ الاستلام</th></tr>
-              ${w.map((x,wi)=>`<tr>
-                <td><span class="chip">${x.name}</span></td>
-                <td><input type="number" inputmode="decimal" value="${x.amount}" style="width:76px;margin:0;padding:4px 6px"
-                  onchange="setWAmt(${mi},${wi},this.value);save()"></td>
-                <td><input type="date" value="${x.date||''}" style="width:130px;margin:0;padding:4px 6px;font-size:.72rem"
-                  onchange="setWDate(${mi},${wi},this.value);save()"></td>
-              </tr>`).join('')}
-            </table>
-            <div style="font-size:.72rem;color:var(--muted);margin-top:6px">
-              المجموع: <b style="color:var(--green)">${fN(wT)}</b>
-              ${Math.abs(rem)>0.01?` | <span style="color:var(--red)">فرق: ${fN(rem)}</span>`:''}
-            </div>` : ''}
-        </div>
-      </div>`;
+          ${hasW?`<table><tr><th>المستلم</th><th>المبلغ</th><th>التاريخ</th></tr>
+            ${w.map((x,wi)=>`<tr>
+              <td><span class="chip">${x.name}</span></td>
+              <td><input type="number" inputmode="decimal" value="${x.amount}" style="width:76px;margin:0;padding:4px 6px" onchange="setWAmt(${mi},${wi},this.value);save()"></td>
+              <td><input type="date" value="${x.date||''}" style="width:130px;margin:0;padding:4px 6px;font-size:.72rem" onchange="setWDate(${mi},${wi},this.value);save()"></td>
+            </tr>`).join('')}</table>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:6px">المجموع: <b style="color:var(--green)">${fN(wT)}</b>${Math.abs(rem)>0.01?` | <span style="color:var(--red)">فرق: ${fN(rem)}</span>`:''}</div>`:''}
+        </div></div>`;
     }).join('');
 
   // Pay
@@ -1004,8 +610,7 @@ function render() {
       const tP=D.members.reduce((s,m)=>s+(r[m.n]&&r[m.n].paid?r[m.n].amount:0),0);
       const tA=D.members.reduce((s,m)=>s+(r[m.n]?r[m.n].amount:0),0);
       const pct=tA>0?Math.round(tP/tA*100):0;
-      return `
-      <div class="month-card">
+      return `<div class="month-card">
         <div class="month-header" onclick="toggle('pb-${mi}')">
           <div><span class="month-title">شهر ${mi+1}</span>
             <span class="chip chip-blue" style="margin-right:4px">${pc}/${D.members.length} دفع</span>
@@ -1013,35 +618,24 @@ function render() {
           <span style="font-size:.73rem;color:${pct===100?'var(--green)':'var(--muted)'}">${pct}% ▾</span>
         </div>
         <div class="month-body" id="pb-${mi}">
-          <div class="progress-bar" style="margin-bottom:10px">
-            <div class="progress-fill" style="width:${pct}%;background:${pct===100?'var(--green)':'var(--gold)'}"></div>
-          </div>
+          <div class="progress-bar" style="margin-bottom:10px"><div class="progress-fill" style="width:${pct}%;background:${pct===100?'var(--green)':'var(--gold)'}"></div></div>
           ${D.members.map(m=>{
             if(!r[m.n])r[m.n]={amount:m.a,paid:false,date:''};
             const rec=r[m.n];
             return `<div class="member-row">
-              <div>
-                <div style="font-weight:600;font-size:.83rem">${m.n}</div>
-                ${rec.date?`<div style="font-size:.66rem;color:var(--muted)">${rec.date}</div>`:''}
-              </div>
+              <div><div style="font-weight:600;font-size:.83rem">${m.n}</div>${rec.date?`<div style="font-size:.66rem;color:var(--muted)">${rec.date}</div>`:''}</div>
               <div style="display:flex;align-items:center;gap:6px">
-                <input type="number" inputmode="decimal" value="${rec.amount}" style="width:76px;margin:0;padding:4px 6px"
-                  onchange="setPAmt(${mi},'${m.n}',this.value);save()">
-                <button class="btn btn-sm ${rec.paid?'btn-green':'btn-red'}"
-                  onclick="togglePaid(${mi},'${m.n}')">${rec.paid?'✔ دفع':'لم يدفع'}</button>
-              </div>
-            </div>`;
+                <input type="number" inputmode="decimal" value="${rec.amount}" style="width:76px;margin:0;padding:4px 6px" onchange="setPAmt(${mi},'${m.n}',this.value);save()">
+                <button class="btn btn-sm ${rec.paid?'btn-green':'btn-red'}" onclick="togglePaid(${mi},'${m.n}')">${rec.paid?'✔ دفع':'لم يدفع'}</button>
+              </div></div>`;
           }).join('')}
-          <div style="font-size:.72rem;color:var(--muted);margin-top:8px">
-            المحصّل: <b style="color:var(--green)">${fN(tP)}</b> / ${fN(tA)}
-          </div>
-        </div>
-      </div>`;
+          <div style="font-size:.72rem;color:var(--muted);margin-top:8px">المحصّل: <b style="color:var(--green)">${fN(tP)}</b> / ${fN(tA)}</div>
+        </div></div>`;
     }).join('');
 
   // Accounts
   const al=document.getElementById('aList');
-  if (!D.members.length){al.innerHTML=`<div class="empty"><div class="empty-icon">📊</div>لا يوجد بيانات</div>`;return;}
+  if(!D.members.length){al.innerHTML=`<div class="empty"><div class="empty-icon">📊</div>لا يوجد بيانات</div>`;return;}
   const rows=D.members.map(m=>{
     let paid=0,pend=0,recv=0;
     D.pay.forEach(r=>{if(r[m.n]){if(r[m.n].paid)paid+=r[m.n].amount;else pend+=r[m.n].amount;}});
@@ -1049,51 +643,36 @@ function render() {
     return {...m,paid,pend,recv,bal:recv-paid};
   });
   al.innerHTML=`
-    <div class="card">
-      <div class="card-title">📋 ملخص الأعضاء</div>
-      <table>
-        <tr><th>العضو</th><th style="color:var(--green)">دفع</th><th style="color:var(--red)">متأخر</th><th style="color:var(--gold)">استلم</th></tr>
-        ${rows.map(r=>`<tr>
-          <td style="font-weight:700">${r.n}</td>
-          <td style="color:var(--green)">${fN(r.paid)}</td>
-          <td style="color:var(--red)">${fN(r.pend)}</td>
-          <td style="color:var(--gold)">${fN(r.recv)}</td>
-        </tr>`).join('')}
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">💰 الرصيد التراكمي</div>
-      ${rows.map(r=>`<div class="member-row">
-        <span style="font-weight:600">${r.n}</span>
-        <span class="chip${r.bal<0?' chip-red':''}" style="font-weight:700">${r.bal>=0?'+':''}${fN(r.bal)}</span>
-      </div>`).join('')}
-      <p style="font-size:.7rem;color:var(--muted);margin-top:8px">الرصيد = ما استلمه − ما دفعه</p>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:var(--gold)">📅 التوزيع الإجمالي</div>
+    <div class="card"><div class="card-title">📋 ملخص الأعضاء</div>
+      <table><tr><th>العضو</th><th style="color:var(--green)">دفع</th><th style="color:var(--red)">متأخر</th><th style="color:var(--gold)">استلم</th></tr>
+        ${rows.map(r=>`<tr><td style="font-weight:700">${r.n}</td><td style="color:var(--green)">${fN(r.paid)}</td><td style="color:var(--red)">${fN(r.pend)}</td><td style="color:var(--gold)">${fN(r.recv)}</td></tr>`).join('')}
+      </table></div>
+    <div class="card"><div class="card-title">💰 الرصيد التراكمي</div>
+      ${rows.map(r=>`<div class="member-row"><span style="font-weight:600">${r.n}</span>
+        <span class="chip${r.bal<0?' chip-red':''}" style="font-weight:700">${r.bal>=0?'+':''}${fN(r.bal)}</span></div>`).join('')}
+      <p style="font-size:.7rem;color:var(--muted);margin-top:8px">الرصيد = ما استلمه − ما دفعه</p></div>
+    <div class="card"><div class="card-title" style="color:var(--gold)">📅 التوزيع الإجمالي</div>
       ${D.dist.map((d,i)=>d.winners.length?`
-        <div class="member-row">
-          <span style="color:var(--muted);font-size:.77rem">شهر ${i+1}</span>
+        <div class="member-row"><span style="color:var(--muted);font-size:.77rem">شهر ${i+1}</span>
           <div>${d.winners.map(w=>`<span class="chip">${w.name} — ${fN(w.amount)}${w.date?' | '+w.date:''}</span>`).join('')}</div>
         </div>` : '').join('')||'<div style="color:var(--muted);font-size:.78rem;padding:8px 0">لم يتم التوزيع بعد</div>'}
     </div>`;
 }
 
-// ══════════════════════════════════════════════
-// RENDER — MEMBER VIEW
-// ══════════════════════════════════════════════
-function renderMemberView() {
+// ══════════════════════════════════════════
+// RENDER MEMBER
+// ══════════════════════════════════════════
+function renderMV(){
   const m=D.members.find(x=>x.n===ME);
-  if (!m){document.getElementById('mvMe').innerHTML=`<div class="empty"><div class="empty-icon">❌</div>العضو غير موجود</div>`;return;}
+  if(!m){document.getElementById('mvMe').innerHTML=`<div class="empty"><div class="empty-icon">❌</div>العضو غير موجود</div>`;return;}
   let paid=0,pend=0,recv=0;
   D.pay.forEach(r=>{if(r[m.n]){if(r[m.n].paid)paid+=r[m.n].amount;else pend+=r[m.n].amount;}});
   D.dist.forEach(d=>d.winners.forEach(w=>{if(w.name===m.n)recv+=w.amount;}));
   const bal=recv-paid;
-
   document.getElementById('mvMe').innerHTML=`
     <div class="mv-card">
       <div class="mv-name">👤 ${m.n}</div>
-      <div style="font-size:.74rem;color:var(--muted)">القسط الشهري: <b style="color:var(--text)">${fN(m.a)}</b></div>
+      <div style="font-size:.74rem;color:var(--muted)">القسط: <b>${fN(m.a)}</b></div>
       <div class="mv-grid">
         <div class="mv-stat"><div class="mv-val" style="color:var(--green)">${fN(paid)}</div><div class="mv-lbl">مدفوع</div></div>
         <div class="mv-stat"><div class="mv-val" style="color:var(--red)">${fN(pend)}</div><div class="mv-lbl">متأخر</div></div>
@@ -1101,84 +680,54 @@ function renderMemberView() {
       </div>
       <div style="background:var(--surface);border-radius:12px;padding:14px;margin-top:6px">
         <div style="font-size:.74rem;color:var(--muted)">رصيدك التراكمي</div>
-        <div style="font-size:1.8rem;font-weight:900;color:${bal>=0?'var(--green)':'var(--red)'}">
-          ${bal>=0?'+':''}${fN(bal)}</div>
+        <div style="font-size:1.8rem;font-weight:900;color:${bal>=0?'var(--green)':'var(--red)'}">${bal>=0?'+':''}${fN(bal)}</div>
         <div style="font-size:.67rem;color:var(--muted)">ما استلمته − ما دفعته</div>
       </div>
     </div>
     <div class="card" style="border-color:var(--blue)">
       <div class="card-title" style="color:var(--blue)">ℹ️ ملاحظة</div>
-      <p style="font-size:.79rem;color:var(--muted)">هذه الواجهة للاطلاع فقط. للاستفسار تواصل مع مدير الجمعية.</p>
+      <p style="font-size:.79rem;color:var(--muted)">للاطلاع فقط. للاستفسار تواصل مع المدير.</p>
     </div>`;
-
   document.getElementById('mvMonths').innerHTML=`
     <div class="card" style="margin-bottom:12px"><div class="card-title">📅 تفاصيل دفعاتي</div></div>
     ${D.pay.map((r,mi)=>{
-      if(!r[m.n])return'';
-      const rec=r[m.n];
-      const myRecv=D.dist[mi]?.winners.find(w=>w.name===m.n);
+      if(!r[m.n])return'';const rec=r[m.n];
+      const myR=D.dist[mi]?.winners.find(w=>w.name===m.n);
       return `<div class="mv-item">
         <span style="color:var(--muted);font-size:.77rem;font-weight:700">شهر ${mi+1}</span>
-        <span style="font-size:.8rem">${fN(rec.amount)}</span>
+        <span>${fN(rec.amount)}</span>
         <div style="text-align:left">
-          <span style="${rec.paid?'color:var(--green)':'color:var(--red)'}">
-            ${rec.paid?`✔ دفعت`:`⏳ لم أدفع`}
-          </span>
-          ${myRecv?`<br><span class="chip chip-gold" style="font-size:.68rem">✔ استلمت ${fN(myRecv.amount)}${myRecv.date?' — '+myRecv.date:''}</span>`:''}
-        </div>
-      </div>`;
+          <span style="${rec.paid?'color:var(--green)':'color:var(--red)'}">${rec.paid?'✔ دفعت':'⏳ لم أدفع'}</span>
+          ${myR?`<br><span class="chip chip-gold" style="font-size:.68rem">✔ استلمت ${fN(myR.amount)}${myR.date?' — '+myR.date:''}</span>`:''}
+        </div></div>`;
     }).join('')}`;
-
-  const distRows=D.dist.map((d,i)=>({i:i+1,w:d.winners})).filter(d=>d.w.length);
+  const dr=D.dist.map((d,i)=>({i:i+1,w:d.winners})).filter(d=>d.w.length);
   document.getElementById('mvDist').innerHTML=`
     <div class="card" style="margin-bottom:12px">
       <div class="card-title" style="color:var(--gold)">💰 توزيع الجمعية</div>
       <p style="font-size:.76rem;color:var(--muted)">السهم: <b style="color:var(--gold)">${fN(D.totalPerMonth)}</b></p>
     </div>
-    ${!distRows.length
-      ?`<div class="empty"><div class="empty-icon">📅</div>لم يتم توزيع أي شهر بعد</div>`
-      :distRows.map(d=>`
-        <div class="mv-item col">
-          <span style="color:var(--muted);font-size:.76rem;font-weight:700">شهر ${d.i}</span>
-          <div>${d.w.map(w=>`<span class="chip ${w.name===m.n?'chip-gold':''}">${w.name} — ${fN(w.amount)}${w.date?' | '+w.date:''}</span>`).join('')}</div>
-        </div>`).join('')}`;
+    ${!dr.length?`<div class="empty"><div class="empty-icon">📅</div>لم يتم توزيع أي شهر بعد</div>`
+      :dr.map(d=>`<div class="mv-item col">
+        <span style="color:var(--muted);font-size:.76rem;font-weight:700">شهر ${d.i}</span>
+        <div>${d.w.map(w=>`<span class="chip ${w.name===m.n?'chip-gold':''}">${w.name} — ${fN(w.amount)}${w.date?' | '+w.date:''}</span>`).join('')}</div>
+      </div>`).join('')}`;
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // RESET
-// ══════════════════════════════════════════════
-function resetAll() {
+// ══════════════════════════════════════════
+function resetAll(){
   confirm2('مسح جميع البيانات؟','لا يمكن التراجع.',()=>{
-    const h=D.adminPasswordHash;
-    D={months:12,totalPerMonth:2500,adminPasswordHash:h,members:[],dist:[],pay:[]};
-    save(); toast('✔ تم المسح');
+    const pw=D.adminPassword;
+    D={months:12,totalPerMonth:2500,adminPassword:pw,members:[],dist:[],pay:[]};
+    save();toast('✔ تم المسح');
   });
 }
 
-// ══════════════════════════════════════════════
-// PWA
-// ══════════════════════════════════════════════
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-}
-let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault(); deferredPrompt=e;
-  document.getElementById('installBanner').classList.add('show');
-});
-function installApp(){
-  if(!deferredPrompt)return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('installBanner').classList.remove('show');});
-}
-function updateOnline(){document.getElementById('offlineBadge').style.display=navigator.onLine?'none':'flex';}
-window.addEventListener('online',updateOnline);
-window.addEventListener('offline',updateOnline);
-updateOnline();
-
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 function toggle(id){const e=document.getElementById(id);if(e)e.classList.toggle('open');}
 function fN(n){return Number(n||0).toLocaleString('ar-SA');}
 let _tt;
@@ -1192,14 +741,13 @@ function confirm2(title,msg,cb){
   openModal('confirmModal');
 }
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-load();
-populateMemberSel();
+// PWA
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 
-// تحميل Firebase بعد عرض الواجهة
-setTimeout(loadFirebaseAsync, 100);
+// INIT
+loadLocal();
+populateMemberSel();
+checkUrl();
 </script>
 
 </body>
