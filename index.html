@@ -174,16 +174,6 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
-
-<div id="loadingScreen" style="position:fixed;inset:0;background:#080e14;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px">
-  <div style="font-size:3rem">🪙</div>
-  <div style="color:#00e676;font-size:1.1rem;font-weight:900">نظام الجمعية</div>
-  <div style="color:#6b8fa8;font-size:.8rem">جاري تحميل البيانات...</div>
-  <div style="width:48px;height:48px;border:3px solid #1e3448;border-top-color:#00e676;border-radius:50%;animation:spin .8s linear infinite"></div>
-</div>
-<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-
 <!-- INSTALL BANNER -->
 
 <div id="installBanner">
@@ -491,9 +481,7 @@ function connectRoom(room) {
     }
     setSyncDot('synced');
     setSyncStatus('متصل — غرفة: ' + room, true);
-    // Hide loading screen on first data load
-    const ls = document.getElementById('loadingScreen');
-    if (ls) ls.style.display = 'none';
+
     // Always update member select when data arrives
     populateMemberSel();
     if (ROLE === 'admin') render();
@@ -501,9 +489,7 @@ function connectRoom(room) {
   }, err => {
     setSyncDot('');
     setSyncStatus('خطأ: ' + err.message, false);
-    // Hide loading even on error
-    const ls = document.getElementById('loadingScreen');
-    if (ls) ls.style.display = 'none';
+
   });
 }
 
@@ -1199,9 +1185,7 @@ function confirm2(title,msg,cb){
 // ══════════════════════════════════════════════
 load();
 populateMemberSel();
-// إخفاء شاشة التحميل بعد تحميل البيانات المحلية فوراً
-const _ls = document.getElementById('loadingScreen');
-if (_ls) _ls.style.display = 'none';
+
 // ثم الاتصال بـ Firebase في الخلفية
 initFirebase();
 </script>
