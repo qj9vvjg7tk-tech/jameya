@@ -12,11 +12,23 @@
 <link rel="manifest" href="manifest.json"/>
 <title>نظام الجمعية</title>
 
-<!-- Firebase SDK -->
+<!-- Firebase SDK — loaded async to not block UI -->
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+function loadFirebaseAsync() {
+  const s1 = document.createElement('script');
+  s1.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+  s1.onload = function() {
+    const s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
+    s2.onload = function() { 
+      if (typeof initFirebase === 'function') initFirebase();
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+</script>
 
 <style>
 :root {
@@ -1186,8 +1198,8 @@ function confirm2(title,msg,cb){
 load();
 populateMemberSel();
 
-// ثم الاتصال بـ Firebase في الخلفية
-initFirebase();
+// تحميل Firebase بعد عرض الواجهة
+setTimeout(loadFirebaseAsync, 100);
 </script>
 
 </body>
