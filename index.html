@@ -9,6 +9,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="الجمعية"/>
 <link rel="manifest" href="manifest.json"/>
+
+<!-- Security Headers -->
+
+<meta http-equiv="Content-Security-Policy"
+content="default-src 'self'; script-src 'self' https://api.jsonbin.io 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.jsonbin.io; frame-ancestors 'none'; block-all-mixed-content">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+
 <title>نظام الجمعية</title>
 <style>
 :root{--bg:#080e14;--surface:#0f1923;--card:#152030;--card2:#1a2a3a;--green:#00e676;--green-dim:#1b4332;--gold:#f9a825;--gold-dim:#3a2800;--red:#ff5252;--red-dim:#3a0a0a;--blue:#40c4ff;--blue-dim:#0a2a3a;--text:#e8f0fe;--muted:#6b8fa8;--border:#1e3448;--radius:14px;--sb:env(safe-area-inset-bottom,0px)}
