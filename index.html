@@ -132,7 +132,18 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
     <div style="text-align:center;font-size:.82rem;color:var(--gold);margin-bottom:12px;font-weight:700">🔑 لوحة المدير السرية</div>
     <div id="adminOptions">
       <button class="btn btn-gold btn-block" onclick="showPwPanel()">🔐 كلمة المرور</button>
+      <button class="btn btn-block" id="pinLoginBtn" onclick="showPinPanel()" style="margin-top:8px;background:var(--surface);border:1px solid var(--blue);color:var(--blue);display:none">🔢 رمز PIN</button>
+      <button class="btn btn-block" id="bioLoginBtn" onclick="biometricLogin()" style="margin-top:8px;background:var(--surface);border:1px solid var(--green);color:var(--green);display:none"><span style="font-size:1.1rem">👆</span> بصمة الإصبع</button>
       <button class="btn btn-muted btn-block" style="margin-top:8px" onclick="hideAdminBox()">إلغاء</button>
+    </div>
+    <div id="pinLoginPanel" style="display:none">
+      <div style="text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:6px">أدخل رمز PIN</div>
+      <div class="pin-display" id="pinLoginDisplay">
+        <div class="pin-dot" id="pld0"></div><div class="pin-dot" id="pld1"></div>
+        <div class="pin-dot" id="pld2"></div><div class="pin-dot" id="pld3"></div>
+      </div>
+      <div class="pin-grid" id="pinLoginGrid"></div>
+      <button class="btn btn-muted btn-block" style="margin-top:10px" onclick="showAdminOptions()">رجوع</button>
     </div>
     <div id="pwPanel" style="display:none">
       <label class="lf-label">كلمة مرور المدير</label>
@@ -234,6 +245,18 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
       <input type="password" id="pw2" placeholder="تأكيد">
       <button class="btn btn-gold btn-block" onclick="changePw()">تغيير</button>
     </div>
+    <div class="card" style="border-color:var(--blue)">
+      <div class="card-title" style="color:var(--blue)">🔢 رمز PIN للمدير</div>
+      <p style="font-size:.77rem;color:var(--muted);margin-bottom:8px">رمز احتياطي من 4 أرقام للدخول السريع</p>
+      <button class="btn btn-blue btn-block" onclick="setupPIN()">⚙️ تعيين PIN جديد</button>
+      <button class="btn btn-muted btn-block" style="margin-top:6px" onclick="deletePIN()">🗑 حذف PIN</button>
+    </div>
+    <div class="card" style="border-color:var(--green)">
+      <div class="card-title" style="color:var(--green)">👆 بصمة الإصبع</div>
+      <p style="font-size:.77rem;color:var(--muted);margin-bottom:8px">دخول سريع بالبصمة (يشترط HTTPS)</p>
+      <button class="btn btn-green btn-block" onclick="doRegisterBio()">🔄 تسجيل البصمة</button>
+      <button class="btn btn-red btn-block" style="margin-top:6px" onclick="deleteBio()">🗑 حذف البصمة</button>
+    </div>
     <div class="card" style="border-color:var(--red)">
       <div class="card-title" style="color:var(--red)">⚠️ خطر</div>
       <button class="btn btn-red btn-block" onclick="resetAll()">🗑 مسح جميع البيانات</button>
@@ -257,13 +280,28 @@ td{border-top:1px solid var(--border);padding:8px 6px;text-align:center}
 </div>
 <div id="toast"></div>
 
+<!-- PIN SETUP MODAL -->
+
+<div class="modal-overlay" id="pinSetupModal">
+  <div class="modal-box">
+    <div class="modal-title">🔢 تعيين رمز PIN</div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px" id="pinSetupMsg">أدخل رمز PIN جديد من 4 أرقام</p>
+    <div class="pin-display" id="pinSetupDisplay">
+      <div class="pin-dot" id="spd0"></div><div class="pin-dot" id="spd1"></div>
+      <div class="pin-dot" id="spd2"></div><div class="pin-dot" id="spd3"></div>
+    </div>
+    <div class="pin-grid" id="pinSetupGrid"></div>
+    <button class="btn btn-muted btn-block" style="margin-top:10px" onclick="closeModal('pinSetupModal');pinSetupStep=0;pinFirst=''">إلغاء</button>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════
 // ⚙️ JSONBin CONFIG — مجاني بدون إعداد
 // ══════════════════════════════════════════
 // سيتم إنشاء bin تلقائياً عند أول استخدام
 const JSONBIN_API = 'https://api.jsonbin.io/v3';
-const JSONBIN_KEY = '$2a$10$'; // سيُستبدل تلقائياً
+const JSONBIN_KEY = '$2a$10$jOscsHsn48yfAdmT4OoPAuW9J5ur/LFcqMdwEWnUulLmoVWHkXC1O';
 let BIN_ID = localStorage.getItem('jameya_bin_id') || '';
 
 // ══════════════════════════════════════════
@@ -305,7 +343,7 @@ async function pushCloud(){
       // Create new bin
       const r=await fetch(JSONBIN_API+'/b',{
         method:'POST',
-        headers:{'Content-Type':'application/json','X-Bin-Private':'false'},
+        headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Private':'false','X-Bin-Name':'jameya-data'},
         body:JSON.stringify(D)
       });
       const j=await r.json();
@@ -316,7 +354,7 @@ async function pushCloud(){
     } else {
       await fetch(JSONBIN_API+'/b/'+BIN_ID,{
         method:'PUT',
-        headers:{'Content-Type':'application/json'},
+        headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},
         body:JSON.stringify(D)
       });
     }
@@ -330,7 +368,7 @@ async function pullCloud(){
   if(!BIN_ID)return;
   setSyncStatus('busy','جاري التحديث...');
   try{
-    const r=await fetch(JSONBIN_API+'/b/'+BIN_ID+'/latest');
+    const r=await fetch(JSONBIN_API+'/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':JSONBIN_KEY}});
     const j=await r.json();
     const pw=D.adminPassword;
     D={...j.record, adminPassword: pw};
@@ -398,9 +436,9 @@ function secretSeq(type){
     }
   }
 }
-function showAdminBox(){document.getElementById('adminBox').style.display='';showAdminOptions();}
+function showAdminBox(){document.getElementById('adminBox').style.display='';showAdminOptions();refreshAdminButtons();}
 function hideAdminBox(){document.getElementById('adminBox').style.display='none';document.getElementById('adminPw').value='';}
-function showAdminOptions(){document.getElementById('adminOptions').style.display='';document.getElementById('pwPanel').style.display='none';}
+function showAdminOptions(){document.getElementById('adminOptions').style.display='';document.getElementById('pwPanel').style.display='none';const pp=document.getElementById('pinLoginPanel');if(pp)pp.style.display='none';}
 function showPwPanel(){document.getElementById('adminOptions').style.display='none';document.getElementById('pwPanel').style.display='';document.getElementById('adminPw').focus();}
 
 // ══════════════════════════════════════════
@@ -408,9 +446,13 @@ function showPwPanel(){document.getElementById('adminOptions').style.display='no
 // ══════════════════════════════════════════
 function adminLogin(){
   if(document.getElementById('adminPw').value!==D.adminPassword){toast('❌ كلمة المرور خاطئة');return;}
-  hideAdminBox();ROLE='admin';
-  startApp('👑 مدير','role-admin','وضع الإدارة الكاملة',true);
-  resetAutoLock();
+  hideAdminBox();enterAdmin();
+  // عرض خيار تسجيل البصمة إذا لم تكن مسجّلة
+  setTimeout(async()=>{
+    if(await isBioSupported()&&!localStorage.getItem(BIO_KEY)){
+      confirm2('👆 تفعيل البصمة','هل تريد تفعيل بصمة الإصبع للدخول السريع؟',()=>doRegisterBio());
+    }
+  },700);
 }
 function memberLogin(){
   const n=document.getElementById('memberSel').value;
@@ -741,6 +783,122 @@ function confirm2(title,msg,cb){
   openModal('confirmModal');
 }
 
+// ══════════════════════════════════════════
+// PIN
+// ══════════════════════════════════════════
+let pinEntry='', pinSetupStep=0, pinFirst='';
+const PIN_KEY='jameya_pin';
+
+function buildPinPad(gridId,pfx,onDigit,onDel){
+  const g=document.getElementById(gridId);if(!g)return;g.innerHTML='';
+  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k=>{
+    const b=document.createElement('button');b.className='pin-btn';b.textContent=k===''?'':k;
+    if(k===''){b.style.visibility='hidden';}
+    else if(k==='⌫')b.onclick=onDel;
+    else b.onclick=()=>onDigit(String(k));
+    g.appendChild(b);
+  });
+}
+function updatePinDots(pfx,val){
+  for(let i=0;i<4;i++){const d=document.getElementById(pfx+i);if(d)d.className='pin-dot'+(i<val.length?' filled':'');}
+}
+function showPinPanel(){
+  document.getElementById('adminOptions').style.display='none';
+  document.getElementById('pwPanel').style.display='none';
+  document.getElementById('pinLoginPanel').style.display='';
+  pinEntry='';updatePinDots('pld',pinEntry);
+  buildPinPad('pinLoginGrid','pld',
+    d=>{if(pinEntry.length<4){pinEntry+=d;updatePinDots('pld',pinEntry);if(pinEntry.length===4)verifyPIN();}},
+    ()=>{pinEntry=pinEntry.slice(0,-1);updatePinDots('pld',pinEntry);}
+  );
+}
+async function verifyPIN(){
+  const stored=localStorage.getItem(PIN_KEY);
+  if(!stored){toast('لم يتم تعيين PIN');showAdminOptions();return;}
+  const h=await sha256(pinEntry);
+  if(h===stored){hideAdminBox();enterAdmin();}
+  else{toast('❌ PIN خاطئ');pinEntry='';updatePinDots('pld',pinEntry);}
+}
+function setupPIN(){
+  pinSetupStep=0;pinFirst='';pinEntry='';
+  document.getElementById('pinSetupMsg').textContent='أدخل رمز PIN جديد من 4 أرقام';
+  updatePinDots('spd',pinEntry);
+  buildPinPad('pinSetupGrid','spd',
+    d=>{if(pinEntry.length<4){pinEntry+=d;updatePinDots('spd',pinEntry);if(pinEntry.length===4)nextPinSetup();}},
+    ()=>{pinEntry=pinEntry.slice(0,-1);updatePinDots('spd',pinEntry);}
+  );
+  openModal('pinSetupModal');
+}
+async function nextPinSetup(){
+  if(pinSetupStep===0){pinFirst=pinEntry;pinEntry='';pinSetupStep=1;document.getElementById('pinSetupMsg').textContent='أعد إدخال PIN للتأكيد';updatePinDots('spd',pinEntry);}
+  else{
+    if(pinEntry===pinFirst){
+      const h=await sha256(pinEntry);localStorage.setItem(PIN_KEY,h);
+      closeModal('pinSetupModal');toast('✔ تم حفظ PIN');refreshAdminButtons();
+    }else{toast('❌ PIN غير متطابق');pinEntry='';pinSetupStep=0;pinFirst='';document.getElementById('pinSetupMsg').textContent='أدخل رمز PIN جديد من 4 أرقام';updatePinDots('spd',pinEntry);}
+  }
+}
+function deletePIN(){localStorage.removeItem(PIN_KEY);refreshAdminButtons();toast('✔ تم حذف PIN');}
+
+// ══════════════════════════════════════════
+// SHA-256
+// ══════════════════════════════════════════
+async function sha256(msg){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ══════════════════════════════════════════
+// BIOMETRIC
+// ══════════════════════════════════════════
+const BIO_KEY='jameya_bio';
+async function isBioSupported(){
+  if(!window.PublicKeyCredential)return false;
+  try{return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();}catch(e){return false;}
+}
+async function doRegisterBio(){
+  if(!await isBioSupported()){toast('⚠️ البصمة غير مدعومة على هذا المتصفح');return;}
+  try{
+    const cred=await navigator.credentials.create({publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)),
+      rp:{name:'الجمعية'},
+      user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'admin',displayName:'المدير'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+      timeout:60000
+    }});
+    if(cred){
+      localStorage.setItem(BIO_KEY,JSON.stringify({id:btoa(String.fromCharCode(...new Uint8Array(cred.rawId)))}));
+      toast('✔ تم تسجيل البصمة');refreshAdminButtons();
+    }
+  }catch(e){if(e.name!=='NotAllowedError')toast('⚠️ تعذّر تسجيل البصمة');}
+}
+async function biometricLogin(){
+  const stored=localStorage.getItem(BIO_KEY);
+  if(!stored){toast('سجّل البصمة أولاً من الإعدادات');return;}
+  try{
+    const cd=JSON.parse(stored);
+    const rawId=Uint8Array.from(atob(cd.id),c=>c.charCodeAt(0));
+    const assertion=await navigator.credentials.get({publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials:[{id:rawId,type:'public-key'}],
+      userVerification:'required',timeout:60000
+    }});
+    if(assertion){hideAdminBox();enterAdmin();toast('✔ تم الدخول بالبصمة');}
+  }catch(e){toast(e.name==='NotAllowedError'?'❌ تم رفض البصمة':'❌ فشل التحقق');}
+}
+function deleteBio(){localStorage.removeItem(BIO_KEY);refreshAdminButtons();toast('✔ تم حذف البصمة');}
+
+function enterAdmin(){ROLE='admin';startApp('👑 مدير','role-admin','وضع الإدارة الكاملة',true);resetAutoLock();}
+
+async function refreshAdminButtons(){
+  const hasPin=!!localStorage.getItem(PIN_KEY);
+  const hasBio=!!localStorage.getItem(BIO_KEY)&&await isBioSupported();
+  const p=document.getElementById('pinLoginBtn');if(p)p.style.display=hasPin?'':'none';
+  const b=document.getElementById('bioLoginBtn');if(b)b.style.display=hasBio?'':'none';
+}
+
+// ══════════════════════════════════════════
 // PWA
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 
@@ -748,6 +906,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 loadLocal();
 populateMemberSel();
 checkUrl();
+refreshAdminButtons();
 </script>
 
 </body>
